@@ -6,6 +6,15 @@ name: Build APK
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
 
 jobs:
   build:
@@ -46,18 +55,34 @@ jobs:
           ndk-version: r27c
           add-to-path: false
 
+      - name: Decode keystore
+        if: github.event.inputs.build_type == 'release'
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ runner.temp }}/keystore.jks
+
+      - name: Determine build type
+        id: build-type
+        run: |
+          TYPE="${{ github.event.inputs.build_type || 'debug' }}"
+          echo "type=$TYPE" >> "$GITHUB_OUTPUT"
+          echo "capitalized=${TYPE^}" >> "$GITHUB_OUTPUT"
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew assembleRelease
+        run: ./gradlew "assemble${{ steps.build-type.outputs.capitalized }}"
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+          KEYSTORE_PATH: ${{ runner.temp }}/keystore.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: twoyi-apk
-          path: app/build/outputs/apk/release/*.apk
+          name: twoyi-${{ steps.build-type.outputs.type }}
+          path: app/build/outputs/apk/${{ steps.build-type.outputs.type }}/*.apk
           retention-days: 30
