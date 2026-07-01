@@ -14,13 +14,16 @@ android {
     namespace 'io.twoyi'
     compileSdk 36
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     def buildSerial = new SimpleDateFormat("MMddHHmm").format(new Date())
 
     defaultConfig {
         applicationId "io.twoyi"
         minSdk 27
         targetSdk 36
-        buildConfig true
         versionCode 30505
         versionName "3.5.5-${buildSerial}"
 
