@@ -1,8 +1,4 @@
 <div align="center">
-    <p><b>Due to the complexity of the project and lack of any revenue, the project has been discontinued.</b></p>
-</div>
-
-<div align="center">
     <p>
     <h3>
       <b>
@@ -18,14 +14,12 @@
   </p>
   <p>
 
-[![contributions welcome](https://img.shields.io/badge/Contributions-welcome-brightgreen?logo=github)](CODE_OF_CONDUCT.md) [![Website](https://img.shields.io/badge/Website-available-brightgreen?logo=e)](https://twoyi.io)
+[![Build APK](https://github.com/costaOSS/twoyi/actions/workflows/build.yml/badge.svg)](https://github.com/costaOSS/twoyi/actions/workflows/build.yml)
   </p>
   <p>
     <sub>
-      Made with ❤︎ by
-      <a href="https://github.com/tiann">
-        weishu
-      </a>
+      Fork maintained by
+      <a href="https://github.com/costaOSS">costaOSS</a>
     </sub>
   </p>
   <br />
@@ -40,68 +34,41 @@
   </p>
 </div>
 
-[README 中文版](README_CN.md)
+## About
 
-## Introduction
+**Twoyi** is a lightweight Android container that runs a secondary Android environment on your device, powered by a Rust native library and an OpenGL ES renderer.
 
-Twoyi is a lightweight Android container. It runs a nearly complete Android system as a normal app (no root required) on Android. Additionally, it supports Android 8.1 ~ 12.
+This is a maintained fork with dependency updates, security fixes, and modernized build toolchain.
 
-## Capability
+## Build
 
-1. Use Taichi·Yang without unlocking the bootloader. Xposed, EdXposed and LSPosed will be supported.
-2. Use root on non-rooted devices.
-3. Use a few Magisk modules.
-4. Implement additional system components such as virtual camera by virtualizing the HAL layer.
-5. Do security research such as shelling.
+You can trigger a build manually from the [Actions tab](https://github.com/costaOSS/twoyi/actions/workflows/build.yml) using the **Run workflow** button.
 
-## Features
+### Prerequisites
 
-1. Twoyi is a rootless Android system-level container, which runs a nearly complete Android system as a normal app and is mostly isolated from the main system.
-2. The internal Android version is Android 8.1 and Android 10 will be supported.
-3. Booting up twoyi is very fast (within three seconds) except for the initialization process.
-4. Twoyi is an open source project.
-5. The internal system of twoyi will be fully customizable. Because its system is open source, you can fork the project to compile your own system. You can also customize the system components, such as the HAL layer to implement virtual cameras, virtual sensors and other special features.
+- JDK 17+
+- Android SDK (platforms 27-36)
+- Android NDK r27c+
+- Rust with `aarch64-linux-android` target
+- [cargo-xdk](https://github.com/tiann/cargo-xdk)
 
-## Building
+### Build locally
 
-Twoyi contains two parts:
+```bash
+git clone https://github.com/costaOSS/twoyi
+cd twoyi
+./gradlew assembleRelease
+```
 
-1. The twoyi app, which is actually a UI rendering engine.
-2. The internal ROM of twoyi.
+The APK will be at `app/build/outputs/apk/release/`.
 
-This repository contains the twoyi app, and the twoyi ROM is currently being turned into open-source.  Therefore, at this moment, the ROM cannot be compiled from source yet.
+### Notes
 
-### Build the App manually
+- The build requires a valid `rootfs.7z` in `app/src/main/assets/` for a functional ROM.
+- The app targets API 27+ with compileSdk 36.
+- All dependencies are updated to their latest stable versions.
+- JCenter repository has been removed (no longer available).
 
-#### Install Rust
+## License
 
-Twoyi is partially written in Rust, so it's nessesary to [install Rust and Cargo](https://www.rust-lang.org/tools/install) first.
-
-#### Install cargo-xdk
-
-Please refer to [cargo-xdk](https://github.com/tiann/cargo-xdk).
-
-You can check if it is installed by running `./gradlew cargoBuild`. If it succeeded, you will see libtwoyi.so in `app/src/main/jniLibs/arm64-v8a`.
-
-PS. Please use ndk v22 or lower, otherwise it may fail.
-
-#### Integrating rootfs
-
-Currently you cannot build the ROM yourself, instead you can use the prebuilt ROM.
-To do that, extract rootfs.7z from the official release apk and copy it to `app/src/main/assets`.
-
-### Build the app with Android Studio
-
-Build it with Android Studio normally.
-
-### Build the ROM
-
-WIP
-
-## Discussion
-
-[Telegram Group](https://t.me/twoyi)
-
-## Contact Me
-
-twsxtd@gmail.com
+This project is licensed under the Mozilla Public License, v. 2.0.

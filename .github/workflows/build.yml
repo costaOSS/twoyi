@@ -1,21 +1,10 @@
-# Copyright Disclaimer: AI-Generated Content
-# This file was created by GitHub Copilot, an AI coding assistant.
-# AI-generated content is not subject to copyright protection and is
-# provided without any warranty, express or implied, including warranties
-# of merchantability, fitness for a particular purpose, or non-infringement.
-# Use at your own risk.
-#
-# NOTE: Placeholder assets are included to allow CI builds.
-# For a functional APK, replace app/src/main/assets/rootfs.7z with:
-# https://github.com/cyanmint/twoyi/releases/download/original/rootfs.7z
----
 name: Build APK
 
 'on':
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -26,11 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
           cache: 'gradle'
 
       - name: Setup Rust
@@ -44,7 +33,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cargo/bin/cargo-xdk
-          key: ${{ runner.os }}-cargo-xdk-2.12.6
+          key: ${{ runner.os }}-cargo-xdk
 
       - name: Install cargo-xdk
         if: steps.cache-cargo-xdk.outputs.cache-hit != 'true'
@@ -64,6 +53,7 @@ jobs:
         run: ./gradlew assembleRelease
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
