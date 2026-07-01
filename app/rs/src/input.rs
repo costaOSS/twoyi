@@ -2,13 +2,21 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-use libc::*;
-use libc::{c_char, c_int};
+use libc::{c_char, c_int, clock_gettime, CLOCK_MONOTONIC, timeval};
+use uinput_sys::{
+    input_event, input_id,
+    EV_ABS, EV_KEY, EV_SYN, SYN_REPORT,
+    ABS_MT_SLOT, ABS_MT_TRACKING_ID, ABS_MT_POSITION_X, ABS_MT_POSITION_Y, ABS_MT_PRESSURE,
+    ABS_MT_TOUCH_MAJOR, ABS_MT_TOUCH_MINOR,
+    ABS_RZ, ABS_THROTTLE, ABS_RUDDER,
+    BTN_TOUCH, BTN_TOOL_FINGER, KEY_BACK,
+    INPUT_PROP_BUTTONPAD,
+    KEY_MAX, ABS_MAX, REL_MAX, SW_MAX, LED_MAX, INPUT_PROP_MAX, ABS_CNT,
+};
 use ndk::event::{MotionAction, MotionEvent};
 use std::mem;
 use std::thread;
-use std::{io::Write};
-use uinput_sys::*;
+use std::io::Write;
 
 use std::sync::mpsc::{ channel, Sender};
 use std::sync::Mutex;
