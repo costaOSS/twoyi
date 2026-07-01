@@ -19,6 +19,7 @@ import android.content.res.ColorStateList;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -157,7 +158,7 @@ public class SelectAppActivity extends AppCompatActivity {
             }
         }
 
-        if (true) {
+        {
             int size = specifiedPackages.size();
             if (size > 1) {
                 specifiedPackages.clear();
@@ -441,7 +442,7 @@ public class SelectAppActivity extends AppCompatActivity {
             List<AppItem> appItems = new ArrayList<>();
             int mask = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
             PackageInfo sys = packageManager.getPackageInfo(
-                    "android", PackageManager.GET_SIGNATURES);
+                    "android", PackageManager.GET_SIGNING_CERTIFICATES);
 
             boolean directlyAdd = true;
 
@@ -652,13 +653,19 @@ public class SelectAppActivity extends AppCompatActivity {
      */
     public static boolean isSystemApp(PackageManager packageManager, String packageName, PackageInfo sys) {
         try {
-            // Get packageinfo for target application
             PackageInfo targetPkgInfo = packageManager.getPackageInfo(
-                    packageName, PackageManager.GET_SIGNATURES);
-            // Get packageinfo for system package
-            // Match both packageinfo for there signatures
-            return (targetPkgInfo != null && targetPkgInfo.signatures != null && sys.signatures[0]
-                    .equals(targetPkgInfo.signatures[0]));
+                    packageName, PackageManager.GET_SIGNING_CERTIFICATES);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                if (targetPkgInfo.signingInfo == null || sys.signingInfo == null) {
+                    return false;
+                }
+                return packageManager.checkSignatures(packageName, "android")
+                        == PackageManager.SIGNATURE_MATCH;
+            } else {
+                return packageManager.checkSignatures(packageName, "android")
+                        == PackageManager.SIGNATURE_MATCH;
+            }
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
@@ -673,7 +680,7 @@ public class SelectAppActivity extends AppCompatActivity {
         try {
             PackageManager packageManager = context.getPackageManager();
             PackageInfo sys = packageManager.getPackageInfo(
-                    "android", PackageManager.GET_SIGNATURES);
+                    "android", PackageManager.GET_SIGNING_CERTIFICATES);
             return isSystemApp(packageManager, packageName, sys);
         } catch (PackageManager.NameNotFoundException e) {
             return false;

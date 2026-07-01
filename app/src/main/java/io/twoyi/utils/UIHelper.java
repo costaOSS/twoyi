@@ -82,7 +82,7 @@ public class UIHelper {
             if (cm == null) {
                 return;
             }
-            cm.setText(weixin);
+            cm.setPrimaryClip(ClipData.newPlainText(null, weixin));
 
             Intent intent = new Intent(Intent.ACTION_MAIN);
             ComponentName cmp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI");

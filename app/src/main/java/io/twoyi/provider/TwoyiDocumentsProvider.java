@@ -108,10 +108,17 @@ public class TwoyiDocumentsProvider extends DocumentsProvider {
 
     @Override
     public String createDocument(String parentDocumentId, String mimeType, String displayName) throws FileNotFoundException {
-        File newFile = new File(parentDocumentId, displayName);
+        File parent = getFileById(parentDocumentId);
+        if (!parent.isDirectory()) {
+            throw new FileNotFoundException("Parent is not a directory: " + parentDocumentId);
+        }
+        File newFile = new File(parent, displayName);
+        if (!isChildDocument(parentDocumentId, newFile.getAbsolutePath())) {
+            throw new SecurityException("Path traversal detected");
+        }
         int noConflictId = 2;
         while (newFile.exists()) {
-            newFile = new File(parentDocumentId, displayName + " (" + noConflictId++ + ")");
+            newFile = new File(parent, displayName + " (" + noConflictId++ + ")");
         }
         try {
             boolean succeeded;
@@ -148,7 +155,14 @@ public class TwoyiDocumentsProvider extends DocumentsProvider {
         if (parentDocumentId == null || documentId == null) {
             return false;
         }
-        return documentId.startsWith(parentDocumentId);
+        try {
+            File parent = new File(parentDocumentId).getCanonicalFile();
+            File child = new File(documentId).getCanonicalFile();
+            return child.getAbsolutePath().startsWith(parent.getAbsolutePath() + File.separator)
+                    || parent.equals(child);
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private static String getDocId(File file) {

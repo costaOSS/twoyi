@@ -4,18 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-
 package io.twoyi;
 
 import android.app.Activity;
@@ -327,29 +315,27 @@ public class Render2Activity extends Activity implements View.OnTouchListener {
         mBootLogView.setVisibility(View.VISIBLE);
         new Thread(() -> {
 
-            if (true) {
-                boolean success = false;
-                try {
-                    // Allow extra time for a Zygote crash-and-restart cycle: after a host
-                    // reboot the guest ART often needs one Zygote restart to regenerate a
-                    // stale dalvik-cache (~14 s), followed by a full system_server boot
-                    // (~30 s).  60 s comfortably covers both in sequence.
-                    success = TwoyiStatusManager.getInstance().waitBoot(60, TimeUnit.SECONDS);
-                } catch (Throwable ignored) {
-                }
+            boolean success = false;
+            try {
+                // Allow extra time for a Zygote crash-and-restart cycle: after a host
+                // reboot the guest ART often needs one Zygote restart to regenerate a
+                // stale dalvik-cache (~14 s), followed by a full system_server boot
+                // (~30 s).  60 s comfortably covers both in sequence.
+                success = TwoyiStatusManager.getInstance().waitBoot(60, TimeUnit.SECONDS);
+            } catch (Throwable ignored) {
+            }
 
-                if (!success) {
-                    LogEvents.trackBootFailure(getApplicationContext());
+            if (!success) {
+                LogEvents.trackBootFailure(getApplicationContext());
 
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), R.string.boot_failed, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), R.string.boot_failed, Toast.LENGTH_SHORT).show());
 
-                    // waiting for track
-                    SystemClock.sleep(3000);
+                // waiting for track
+                SystemClock.sleep(3000);
 
-                    finish();
-                    System.exit(0);
-                    return;
-                }
+                finish();
+                System.exit(0);
+                return;
             }
 
             runOnUiThread(() -> {
@@ -418,7 +404,7 @@ public class Render2Activity extends Activity implements View.OnTouchListener {
         for (Display.Mode supportedMode : supportedModes) {
             float refreshRate = supportedMode.getRefreshRate();
             if (refreshRate > fps) {
-                // fps = refreshRate;
+                fps = refreshRate;
             }
         }
 
